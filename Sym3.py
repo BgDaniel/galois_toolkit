@@ -18,7 +18,7 @@ class Sym3(SymGroup):
 
     '''S2 in S3'''
     def group_S2(self):
-        return PermutationGroup([Permutation([1, 0, 2]), Permutation([0, 2, 1]), Permutation([2, 1, 1])])
+        return PermutationGroup([Permutation([1, 0, 2]), Permutation([0, 2, 1]), Permutation([2, 1, 0])])
 
     '''A3 in S3'''
     def group_A3(self):

@@ -86,7 +86,3 @@ class Sym5(SymGroup):
     '''A5 in S5'''
     def group_A5(self):
         return PermutationGroup([Permutation([4, 0, 1, 2, 3]), Permutation([2, 0, 1, 3, 4])])
-
-
-sym5 = Sym5()
-print(sym5.list_subgroups())
