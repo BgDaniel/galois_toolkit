@@ -6,7 +6,7 @@ class Sym4(SymGroup):
     def __init__(self):
         SymGroup.__init__(self, 4)
 
-    '''https://www.google.de/search?q=add+url+as+comment+python&ie=&oe='''
+    '''https://groupprops.subwiki.org/wiki/Subgroup_structure_of_symmetric_group:S4'''
 
     '''whole subgroup'''
     def group_Sym4(self):
