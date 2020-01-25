@@ -33,6 +33,47 @@ def poly_over_integers(p, precision = 10e-15):
 
     return True, P(c_rounded) 
 
+def poly_to_str(p):
+    assert type(p) == PolyEquation or type(p) == P, 'Wrong input type for poly_over_integers()!'
+    p_str = ""
+
+    coefficients = []    
+    
+    if type(p) == PolyEquation:
+        coefficients = p.Coefficients
+    elif type(p) == P:
+        coefficients = p.coef
+
+    for i, c in enumerate(coefficients):
+        if c == 0:
+            continue
+        if i == 0:
+            if c < 0:
+                p_str = "- {0} ".format(-c) + p_str
+            else:
+                p_str = "+ {0} ".format(c) + p_str
+        elif i == 1:
+            if c < 0:
+                p_str = "- {0} * X ".format(-c) + p_str
+            else:
+                p_str = "+ {0} * X ".format(c) + p_str
+        else:
+            if c < 0:
+                if c == 1.0:
+                    p_str = "- X^{1} ".format(-c, i) + p_str
+                else:
+                    p_str = "- {0} * X^{1} ".format(-c, i) + p_str
+            else:
+                if c == 1.0:
+                    if i == len(coefficients) - 1:
+                        p_str = "X^{1} ".format(-c, i) + p_str
+                    else:
+                        p_str = "+ X^{1} ".format(-c, i) + p_str
+                else:
+                    p_str = "+ {0} * X^{1} ".format(c, i) + p_str
+
+    return p_str
+
 class PolyEquation:
 
     @property
@@ -73,6 +114,7 @@ class PolyEquation:
 
         self._galois_resolvent = None
         self._sym_galois = None
+        self._integer_polynoms = None
 
     def from_polynom(polynom):
         return PolyEquation(polynom.coef)
@@ -124,8 +166,10 @@ class PolyEquation:
         return self._sym_galois_pol
 
     def determine_galois_group(self):
-        integer_polynoms = {}
+        self._integer_polynoms = {}
         galois_group = None
+        galois_polynom = None
+        galois_name = None
 
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
@@ -145,19 +189,24 @@ class PolyEquation:
                 _, remainder = divmod(self._sym_galois_pol, p_int)
 
                 if poly_over_integers(remainder):
-                    integer_polynoms[key] = {   'polynom'       : str(p_int), 
-                                                'group'         : key,
-                                                'group order'   : len(value._elements),
-                                                'elements'      : [per.array_form for per in value._elements],                                                 
-                                            }
+                    self._integer_polynoms[key] =   {   
+                                                        'polynom'       : str(p_int), 
+                                                        'group'         : key,
+                                                        'group order'   : len(value._elements),
+                                                        'elements'      : [per.array_form for per in value._elements],                                                 
+                                                    }
 
                     if galois_group == None:
                         galois_group = value
+                        galois_polynom = p_int
+                        galois_name = key
                     else:
                         if len(value._elements) < len(galois_group._elements):
                             galois_group = value
+                            galois_polynom = p_int
+                            galois_name = key
 
-        return galois_group, integer_polynoms
+        return galois_name, [per.array_form for per in galois_group._elements], poly_to_str(galois_polynom)
 
         
 
