@@ -27,10 +27,18 @@ def poly_over_integers(p, precision = 10e-15):
 
     c_rounded = []
     for i, c in enumerate(coefficients):
-        if abs(round(c) - c) > precision:
-            return False, None
+        if type(c) == mpc:
+            if abs(round(c.imag) - .0) > precision:
+                return False, None
+            if abs(round(c.real) - c.real) > precision:
+                return False, None
+            else:
+                c_rounded.append(int(round(c.real)))
         else:
-            c_rounded.append(int(round(c)))
+            if abs(round(c) - c) > precision:
+                return False, None
+            else:
+                c_rounded.append(int(round(c)))
 
     return True, P(c_rounded) 
 
@@ -137,9 +145,15 @@ class PolyEquation:
             number_equal = 0
 
             for i, per_i in enumerate(self._permutation_group.elements):
+                if number_equal > 0:
+                    continue
+                
                 galois_res_i = galois_res.permutate(per_i)
 
                 for j, per_j in enumerate(self._permutation_group.elements):
+                    if number_equal > 0:
+                        continue
+
                     if j > i:
                         galois_res_j = galois_res.permutate(per_j)
 
@@ -162,8 +176,13 @@ class PolyEquation:
             galois_res = self._galois_resolvent.permutate(per_i)
             sym_galois_pol *= P([-galois_res.Value, 1.0])
 
-        self._sym_galois_pol = P([int(c) for c in sym_galois_pol.coef])
-        return self._sym_galois_pol
+        over_int, sym_galois_pol_int = poly_over_integers(sym_galois_pol)
+
+        if over_int:
+            self._sym_galois_pol = P([c for c in sym_galois_pol.coef])
+            return self._sym_galois_pol
+        else:
+            raise Exception('Nummerically calculated symmetric Galois polynom has no integer coefficients!')
 
     def determine_galois_group(self):
         self._integer_polynoms = {}

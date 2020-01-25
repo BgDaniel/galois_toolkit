@@ -12,7 +12,7 @@ galois_resolvent = polynom.galois_resolvent()
 print(polynom.determine_galois_group())
 
 coefficients = [-1, -1, 0, 0, 0, 1]
-polynom = PolyEquation(coefficients, 75, 5000, -5, +5)
+polynom = PolyEquation(coefficients, 100, 5000, -5, +5)
 galois_resolvent = polynom.galois_resolvent()
 print(polynom.determine_galois_group())
 
