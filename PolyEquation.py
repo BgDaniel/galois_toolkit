@@ -89,10 +89,13 @@ class PolyEquation:
     def Roots(self):
         return self._roots
 
-    def __init__(self, coefficients, dps = 50):
+    def __init__(self, coefficients, dps, max_iterations, m_min, m_max):
         self._coefficients = coefficients
         self._polynom = P(coefficients) 
         self._degree = len(coefficients) - 1
+        self._max_iterations = max_iterations
+        self._m_min = m_min
+        self._m_max = m_max
 
         assert self._degree >= 2 and self._degree <= 5, 'Degree of polynom must be between 3 and 5!'
 
@@ -123,11 +126,11 @@ class PolyEquation:
     def __call__(self, x):
         return poly.polyval(x, self._coefficients)
 
-    def galois_resolvent(self, max_iterations = MAX_ITERATIONS, m_min = -2, m_max = +2):
+    def galois_resolvent(self):
         iteration = 0
         number_equal = - 1
 
-        for m in tuples(self._degree, m_min, m_max):
+        for m in tuples(self._degree, self._m_min, self._m_max):
             iteration += 1
             
             galois_res = GaloisResolvent(m, self._roots)
@@ -147,7 +150,7 @@ class PolyEquation:
                 self._galois_resolvent = galois_res
                 self.sym_galois_poly()
                 return 'Found Galois resolvent after {} iterations.'.format(str(iteration)), galois_res
-            elif max_iterations == iteration:
+            elif self._max_iterations == iteration:
                 return 'Maximal number of iterations reached ({})! Could not find Galois resolvent.'.format(str(max_iterations))
 
     def sym_galois_poly(self):
