@@ -11,3 +11,8 @@ polynom = PolyEquation(coefficients)
 galois_resolvent = polynom.galois_resolvent()
 print(polynom.determine_galois_group())
 
+coefficients = [-1, -1, 0, 0, 0, 1]
+polynom = PolyEquation(coefficients, 75)
+galois_resolvent = polynom.galois_resolvent(-5, 5)
+print(polynom.determine_galois_group())
+

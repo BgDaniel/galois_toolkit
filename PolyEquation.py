@@ -9,6 +9,7 @@ from GaloisResolvent import *
 from Sym5 import Sym5
 from Sym4 import Sym4
 from Sym3 import Sym3
+from helpers import *
 
 
 MAX_ITERATIONS = 5000
@@ -122,14 +123,13 @@ class PolyEquation:
     def __call__(self, x):
         return poly.polyval(x, self._coefficients)
 
-    def galois_resolvent(self, max_iterations = MAX_ITERATIONS):
+    def galois_resolvent(self, max_iterations = MAX_ITERATIONS, m_min = -2, m_max = +2):
         iteration = 0
-        found_galois_resolvente = False
+        number_equal = - 1
 
-        while not found_galois_resolvente and iteration < max_iterations:
+        for m in tuples(self._degree, m_min, m_max):
             iteration += 1
             
-            m  = [randint(-2, +2) for i in range(0, len(self._roots))]
             galois_res = GaloisResolvent(m, self._roots)
             number_equal = 0
 
@@ -144,14 +144,11 @@ class PolyEquation:
                             number_equal += 1
             
             if number_equal == 0:
-                found_galois_resolvente = True
                 self._galois_resolvent = galois_res
-
-        if found_galois_resolvente == True:
-            self.sym_galois_poly()
-            return 'Found Galois resolvent after {} iterations.'.format(str(iteration)), galois_res
-        else:
-            return 'Maximal number of iterations reached ({})! Could not find Galois resolvent.'.format(str(max_iterations))
+                self.sym_galois_poly()
+                return 'Found Galois resolvent after {} iterations.'.format(str(iteration)), galois_res
+            elif max_iterations == iteration:
+                return 'Maximal number of iterations reached ({})! Could not find Galois resolvent.'.format(str(max_iterations))
 
     def sym_galois_poly(self):
         if self._galois_resolvent == None:
