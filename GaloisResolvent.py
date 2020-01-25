@@ -65,30 +65,6 @@ class GaloisResolvent:
             print('Maximal number of iterations reached ({0})! Could not find Galois resolvent whose orbit is bounded by {1}.'.format(str(max_iterations)), str(max_norm))
 
 
-
-
-
-
-
-        
-
-def poly_over_integers(p, precision = 10e-9):
-    c_rounded = []
-    for i, c in enumerate(p.coef):
-        if abs(round(c) - c) > 10e-9:
-            return False, None
-        else:
-            c_rounded.append(int(round(c)))
-
-    return True, P(c_rounded) 
-
-def is_factor(p, q):
-
-    self._sym_galois
-    s = divmod(p, q)
-    return(s)
-
-
       
 
 

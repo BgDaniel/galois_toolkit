@@ -7,21 +7,20 @@ from sympy.combinatorics.named_groups import SymmetricGroup
 from sympy.combinatorics import PermutationGroup
 from sympy.combinatorics.permutations import Permutation
 
-class SymGroup(PermutationGroup):
-    
+class SymGroup:
+
     def __init__(self, n):
         self._sym_n = SymmetricGroup(n)
-        PermutationGroup.__init__(self._sym_n._elements)
-
+        self._elements = self._sym_n._elements
         self._path_serialization = os.path.join(os.path.dirname(__file__), 'sym_{0}.json'.format(n))
-
-        if path.exists(self._path_serialization):
-            os.remove(self._path_serialization)
-
         self._subgroups = self.list_subgroups()        
 
         with open(self._path_serialization, 'w') as write_file:
             json.dump(self._subgroups, write_file)
+
+    @property
+    def elements(self):
+        return self._elements
         
     def list_subgroups(self):        
         if path.exists(self._path_serialization):
@@ -47,8 +46,8 @@ class SymGroup(PermutationGroup):
                                         
             return subgroups
 
-    def list_automorphism_class_of_subgroups(self):
-        auto_classes = { 'whole group' : [self._sym_n] }
+    def automorphism_classes(self):
+        auto_classes = {}
 
         for auto_class_name in dir(self):
             if auto_class_name.startswith('group_'):

@@ -14,6 +14,25 @@ from Sym3 import Sym3
 MAX_ITERATIONS = 5000
 PRECISION = 0.00000001
 
+def poly_over_integers(p, precision = 10e-15):
+    assert type(p) == PolyEquation or type(p) == P, 'Wrong input type for poly_over_integers()!'
+    
+    coefficients = []    
+    
+    if type(p) == PolyEquation:
+        coefficients = p.Coefficients
+    elif type(p) == P:
+        coefficients = p.coef
+
+    c_rounded = []
+    for i, c in enumerate(coefficients):
+        if abs(round(c) - c) > precision:
+            return False, None
+        else:
+            c_rounded.append(int(round(c)))
+
+    return True, P(c_rounded) 
+
 class PolyEquation:
 
     @property
@@ -52,9 +71,11 @@ class PolyEquation:
         elif self._degree == 3:
             self._permutation_group = Sym3()
 
-        self._permutation_group = SymmetricGroup(self._degree)
         self._galois_resolvent = None
         self._sym_galois = None
+
+    def from_polynom(polynom):
+        return PolyEquation(polynom.coef)
 
     def __call__(self, x):
         return poly.polyval(x, self._coefficients)
@@ -70,10 +91,10 @@ class PolyEquation:
             galois_res = GaloisResolvent(m, self._roots)
             number_equal = 0
 
-            for i, per_i in enumerate(self._permutation_group._elements):
+            for i, per_i in enumerate(self._permutation_group.elements):
                 galois_res_i = galois_res.permutate(per_i)
 
-                for j, per_j in enumerate(self._permutation_group._elements):
+                for j, per_j in enumerate(self._permutation_group.elements):
                     if j > i:
                         galois_res_j = galois_res.permutate(per_j)
 
@@ -85,6 +106,7 @@ class PolyEquation:
                 self._galois_resolvent = galois_res
 
         if found_galois_resolvente == True:
+            self.sym_galois_poly()
             return 'Found Galois resolvent after {} iterations.'.format(str(iteration)), galois_res
         else:
             return 'Maximal number of iterations reached ({})! Could not find Galois resolvent.'.format(str(max_iterations))
@@ -93,34 +115,52 @@ class PolyEquation:
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
         
-        sym_galois_pol = P([Decimal(1)])
+        sym_galois_pol = P([1.0])
         for i, per_i in enumerate(self._permutation_group._elements):
             galois_res = self._galois_resolvent.permutate(per_i)
-            sym_galois_pol *= P([-galois_res.Value, Decimal(1)])
+            sym_galois_pol *= P([-galois_res.Value, 1.0])
 
         self._sym_galois_pol = P([int(c) for c in sym_galois_pol.coef])
         return self._sym_galois_pol
 
-    def get_factors(self, sym):
-        subgroups = sym.subgroups()
+    def determine_galois_group(self):
         integer_polynoms = {}
+        galois_group = None
 
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
 
-        for key, per_groups in subgroups.items():
-            for per_group in per_groups:
-                p = P([1.0])
-                for per in per_group._elements:
-                    galois_res = self._galois_resolvent.permutate(per).Value
-                    p *= P([galois_res, 1.0])
+        auto_classes = self._permutation_group.automorphism_classes()
 
-                has_integer_coefficients, p_int = poly_over_integers(p)
+        for key, value in auto_classes.items():
+            p = P([1.0])
+            
+            for permutation in value._elements:
+                galois_res = self._galois_resolvent.permutate(permutation).Value
+                p *= P([galois_res, 1.0])
 
-                if has_integer_coefficients and is_factor(self._polynom, p_int):
-                    if key not in integer_polynoms:
-                        integer_polynoms[key] = [p_int, per_group._elements]
+            p_over_int, p_int = poly_over_integers(p)
+
+            if p_over_int:
+                _, remainder = divmod(self._sym_galois_pol, p_int)
+
+                if poly_over_integers(remainder):
+                    integer_polynoms[key] = {   'polynom'       : str(p_int), 
+                                                'group'         : key,
+                                                'group order'   : len(value._elements),
+                                                'elements'      : [per.array_form for per in value._elements],                                                 
+                                            }
+
+                    if galois_group == None:
+                        galois_group = value
                     else:
-                        integer_polynoms[key].append([p_int, per_group._elements])
+                        if len(value._elements) < len(galois_group._elements):
+                            galois_group = value
+
+        return galois_group, integer_polynoms
+
         
-        return integer_polynoms
+
+
+
+
