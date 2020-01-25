@@ -6,14 +6,14 @@ from os import path
 from sympy.combinatorics.named_groups import SymmetricGroup
 from sympy.combinatorics import PermutationGroup
 from sympy.combinatorics.permutations import Permutation
-from group_helpers import *
+from helpers.group_helpers import *
 
 class SymGroup:
 
     def __init__(self, n):
         self._sym_n = SymmetricGroup(n)
         self._elements = self._sym_n._elements
-        self._path_serialization = os.path.join(os.path.dirname(__file__), 'sym_{0}.json'.format(n))
+        self._path_serialization = os.path.join(os.path.dirname(__file__), 'symmetric_groups/sym_{0}.json'.format(n))
         self._subgroups = self.list_subgroups()        
 
         with open(self._path_serialization, 'w') as write_file:
@@ -29,7 +29,7 @@ class SymGroup:
                 subgroups_str = read_file.read()
                 return json.loads(subgroups_str)
         else:
-            subgroups = { }
+            subgroups = {}
 
             for auto_class_name in dir(self):
                 if auto_class_name.startswith('group_'):
@@ -62,6 +62,20 @@ class SymGroup:
                     auto_classes[auto_class_name] = group_repr
 
         return auto_classes
+
+    def subgroups(self):
+        subgroups = {}
+
+        for auto_class_name in dir(self):
+            if auto_class_name.startswith('group_'):
+                auto_class = getattr(self, auto_class_name)
+
+                if callable(auto_class):
+                    group_repr = auto_class()
+                    auto_class_name = auto_class_name.replace('group_', '')
+                    subgroups[auto_class_name] = conjugated_subgroups(group_repr, auto_class_name, self._sym_n)
+
+        return subgroups
 
 def inv(p):
     ell = len(p.array_form)

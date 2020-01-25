@@ -6,11 +6,11 @@ from mpmath import *
 from random import randint
 
 from GaloisResolvent import *
-from Sym5 import Sym5
-from Sym4 import Sym4
-from Sym3 import Sym3
-from math_helpers import *
-from group_helpers import *
+from symmetric_groups.Sym5 import Sym5
+from symmetric_groups.Sym4 import Sym4
+from symmetric_groups.Sym3 import Sym3
+from helpers.math_helpers import *
+from helpers.group_helpers import *
 
 
 MAX_ITERATIONS = 5000
@@ -195,41 +195,42 @@ class PolyEquation:
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
 
-        auto_classes = self._permutation_group.automorphism_classes()
+        subgroups = self._permutation_group.subgroups()
 
-        for key, value in auto_classes.items():
-            p = P([1.0])
+        for key, value in subgroups.items():
+            for subgroup in value:
+                p = P([1.0])
             
-            for permutation in value._elements:
-                galois_res = self._galois_resolvent.permutate(permutation).Value
-                p *= P([galois_res, 1.0])
+                for permutation in subgroup._elements:
+                    galois_res = self._galois_resolvent.permutate(permutation).Value
+                    p *= P([galois_res, 1.0])
 
-            p_over_int, p_int = poly_over_integers(p)
+                p_over_int, p_int = poly_over_integers(p)
 
-            if p_over_int:
-                _, remainder = divmod(self._sym_galois_pol, p_int)
+                if p_over_int:
+                    _, remainder = divmod(self._sym_galois_pol, p_int)
 
-                if poly_over_integers(remainder):
-                    is_solv, _ = is_solvable(value)
-                    self._integer_polynoms[key] =   {   
+                    if poly_over_integers(remainder):
+                        is_solv, _ = is_solvable(subgroup)
+                        self._integer_polynoms[key] =   {   
                                                         'polynom'       : str(p_int), 
                                                         'group'         : key,
-                                                        'group order'   : len(value._elements),
+                                                        'group order'   : len(subgroup._elements),
                                                         'solvable'      : is_solv,
-                                                        'elements'      : [per.array_form for per in value._elements],                                                 
+                                                        'elements'      : [per.array_form for per in subgroup._elements],                                                 
                                                     }
 
-                    if galois_group == None:
-                        galois_group = value
-                        galois_polynom = p_int
-                        galois_name = key
-                        galois_is_solvable = is_solv
-                    else:
-                        if len(value._elements) < len(galois_group._elements):
-                            galois_group = value
+                        if galois_group == None:
+                            galois_group = subgroup
                             galois_polynom = p_int
                             galois_name = key
                             galois_is_solvable = is_solv
+                        else:
+                            if len(subgroup._elements) < len(galois_group._elements):
+                                galois_group = subgroup
+                                galois_polynom = p_int
+                                galois_name = key
+                                galois_is_solvable = is_solv
 
         return galois_name, "solvable: {0}".format(galois_is_solvable), [per.array_form for per in galois_group._elements], poly_to_str(galois_polynom)
 
