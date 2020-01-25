@@ -9,9 +9,9 @@ class Sym5(SymGroup):
 
 
     
-    '''https://groupprops.subwiki.org/wiki/Symmetric_group:S5'''
+    '''https://groupprops.subwiki.org/wiki/Subgroup_structure_of_symmetric_group:S5'''
 
-    '''trivial subgroup'''
+    '''whole subgroup'''
     def group_Sym5(self):
         return self._sym_n
 

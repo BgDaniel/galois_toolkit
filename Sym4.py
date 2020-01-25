@@ -8,8 +8,8 @@ class Sym4(SymGroup):
 
     '''https://www.google.de/search?q=add+url+as+comment+python&ie=&oe='''
 
-    '''trivial subgroup'''
-    def group_Sym5(self):
+    '''whole subgroup'''
+    def group_Sym4(self):
         return self._sym_n
 
     '''trivial subgroup'''
