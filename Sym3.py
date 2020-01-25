@@ -2,7 +2,7 @@ from sympy.combinatorics import PermutationGroup
 from SymGroup import SymGroup
 from sympy.combinatorics.permutations import Permutation
 
-class Sym4(SymGroup):
+class Sym3(SymGroup):
     def __init__(self):
         SymGroup.__init__(self, 3)
 
