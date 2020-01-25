@@ -6,6 +6,7 @@ from os import path
 from sympy.combinatorics.named_groups import SymmetricGroup
 from sympy.combinatorics import PermutationGroup
 from sympy.combinatorics.permutations import Permutation
+from group_helpers import *
 
 class SymGroup:
 
@@ -36,11 +37,13 @@ class SymGroup:
 
                     if callable(auto_class):
                         group_repr = auto_class()
+                        is_solv, group_tower = is_solvable(group_repr)
                         auto_class_name = auto_class_name.replace('group_', '')
                         conj_subgroups = conjugated_subgroups(group_repr, auto_class_name, self._sym_n)
 
                         subgroups[auto_class_name] = {  'number conjugated subgroups' : group_repr.degree,
                                                         'group order' : len(group_repr._elements),
+                                                        'solvable': is_solv,     
                                                         'subgroups' : [[per.array_form for per in conj_subgroup._elements] for conj_subgroup in conj_subgroups]
                                                     }
                                         

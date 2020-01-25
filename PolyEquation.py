@@ -9,7 +9,8 @@ from GaloisResolvent import *
 from Sym5 import Sym5
 from Sym4 import Sym4
 from Sym3 import Sym3
-from helpers import *
+from math_helpers import *
+from group_helpers import *
 
 
 MAX_ITERATIONS = 5000
@@ -28,17 +29,17 @@ def poly_over_integers(p, precision = 10e-15):
     c_rounded = []
     for i, c in enumerate(coefficients):
         if type(c) == mpc:
-            if abs(round(c.imag) - .0) > precision:
+            if abs(nint(c.imag) - .0) > precision:
                 return False, None
-            if abs(round(c.real) - c.real) > precision:
+            if abs(nint(c.real) - c.real) > precision:
                 return False, None
             else:
-                c_rounded.append(int(round(c.real)))
+                c_rounded.append(nint(c.real))
         else:
-            if abs(round(c) - c) > precision:
+            if abs(nint(c) - c) > precision:
                 return False, None
             else:
-                c_rounded.append(int(round(c)))
+                c_rounded.append(nint(c))
 
     return True, P(c_rounded) 
 
@@ -189,6 +190,7 @@ class PolyEquation:
         galois_group = None
         galois_polynom = None
         galois_name = None
+        galois_is_solvable = False
 
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
@@ -208,10 +210,12 @@ class PolyEquation:
                 _, remainder = divmod(self._sym_galois_pol, p_int)
 
                 if poly_over_integers(remainder):
+                    is_solv, _ = is_solvable(value)
                     self._integer_polynoms[key] =   {   
                                                         'polynom'       : str(p_int), 
                                                         'group'         : key,
                                                         'group order'   : len(value._elements),
+                                                        'solvable'      : is_solv,
                                                         'elements'      : [per.array_form for per in value._elements],                                                 
                                                     }
 
@@ -219,13 +223,15 @@ class PolyEquation:
                         galois_group = value
                         galois_polynom = p_int
                         galois_name = key
+                        galois_is_solvable = is_solv
                     else:
                         if len(value._elements) < len(galois_group._elements):
                             galois_group = value
                             galois_polynom = p_int
                             galois_name = key
+                            galois_is_solvable = is_solv
 
-        return galois_name, [per.array_form for per in galois_group._elements], poly_to_str(galois_polynom)
+        return galois_name, "solvable: {0}".format(galois_is_solvable), [per.array_form for per in galois_group._elements], poly_to_str(galois_polynom)
 
         
 
