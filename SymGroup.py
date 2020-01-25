@@ -1,6 +1,8 @@
+import numpy as np
+
 from sympy.combinatorics.named_groups import SymmetricGroup
 from sympy.combinatorics import PermutationGroup
-
+from sympy.combinatorics.permutations import Permutation
 
 class SymGroup(PermutationGroup):
     def __init__(self, n):
@@ -8,7 +10,7 @@ class SymGroup(PermutationGroup):
         PermutationGroup.__init__(self._sym_n._elements)
 
     def list_subgroups(self):
-        subgroups = { self._sym_n.order : [self._sym4] }
+        subgroups = { self._sym_n.order : [self._sym_n] }
 
         for auto_class_name in dir(self):
             if auto_class_name.startswith('group_'):
@@ -17,7 +19,7 @@ class SymGroup(PermutationGroup):
                 if callable(auto_class):
                     group_repr = auto_class()
                     auto_class_name = auto_class_name.replace('group_', '')
-                    conj_subgroups = conjugated_subgroups(group_repr, auto_class_name, self._sym4)
+                    conj_subgroups = conjugated_subgroups(group_repr, auto_class_name, self._sym_n)
                     for conj_subgroup in conj_subgroups:
                         if not conj_subgroup in subgroups:
                             order = conj_subgroup.order()

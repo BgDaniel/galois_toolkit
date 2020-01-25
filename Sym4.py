@@ -50,5 +50,6 @@ class Sym4(SymGroup):
 
 
 sym4 = Sym4()
-auto_classes = subgroups = sym4.list_automorphism_class_of_subgroups()
-print(auto_classes)
+auto_classes = sym4.list_automorphism_class_of_subgroups()
+sub_groups = sym4.list_subgroups()
+print(sub_groups)
