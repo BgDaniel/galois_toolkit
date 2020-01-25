@@ -9,6 +9,10 @@ class Sym4(SymGroup):
     '''https://www.google.de/search?q=add+url+as+comment+python&ie=&oe='''
 
     '''trivial subgroup'''
+    def group_Sym5(self):
+        return self._sym_n
+
+    '''trivial subgroup'''
     def group_Trivial(self):
         return PermutationGroup([Permutation([0, 1, 2, 3])])
 
@@ -50,6 +54,4 @@ class Sym4(SymGroup):
 
 
 sym4 = Sym4()
-auto_classes = sym4.list_automorphism_class_of_subgroups()
-sub_groups = sym4.list_subgroups()
-print(sub_groups)
+print(sym4.list_subgroups())
