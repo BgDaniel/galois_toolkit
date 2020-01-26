@@ -135,6 +135,9 @@ class PolyEquation:
     def __call__(self, x):
         return poly.polyval(x, self._coefficients)
 
+    def try_factorize(self):
+        return None
+
     def galois_resolvent(self):
         iteration = 0
         number_equal = - 1
@@ -166,7 +169,7 @@ class PolyEquation:
                 self.sym_galois_poly()
                 return 'Found Galois resolvent after {} iterations.'.format(str(iteration)), galois_res
             elif self._max_iterations == iteration:
-                return 'Maximal number of iterations reached ({})! Could not find Galois resolvent.'.format(str(max_iterations))
+                return 'Maximal number of iterations reached ({})! Could not find Galois resolvent.'.format(str(max_iterations)), None
 
     def sym_galois_poly(self):
         if self._galois_resolvent == None:
@@ -194,6 +197,9 @@ class PolyEquation:
 
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
+
+        if self._galois_resolvent == None:
+            return None, None, None, None
 
         subgroups = self._permutation_group.subgroups()
 
