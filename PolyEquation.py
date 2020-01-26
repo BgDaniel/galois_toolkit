@@ -135,8 +135,33 @@ class PolyEquation:
     def __call__(self, x):
         return poly.polyval(x, self._coefficients)
 
-    def try_factorize(self):
-        return None
+    def is_irreducible(self):
+        factorizations = []
+        indicators = all_power_sets(self._degree) 
+
+        for indicator in indicators:
+            if sum(indicator) == 0 or sum(indicator) == self._degree:
+                continue
+
+            p = P([1.0])
+            q = P([1.0])
+
+            for i, ind in enumerate(indicator):
+                if ind == 1:
+                    p *= P([- self._roots[i], 1.0])
+                else:
+                    q *= P([- self._roots[i], 1.0])
+
+            p_has_int_coefficients, p_int = poly_over_integers(p)
+            q_has_int_coefficients, q_int = poly_over_integers(q)
+
+            if p_has_int_coefficients and q_has_int_coefficients:
+                factorizations.append([p_int, q_int])
+
+        if len(factorizations) > 0:
+            return True, factorizations
+        else:
+            return False, None
 
     def galois_resolvent(self):
         iteration = 0
@@ -209,7 +234,7 @@ class PolyEquation:
             
                 for permutation in subgroup._elements:
                     galois_res = self._galois_resolvent.permutate(permutation).Value
-                    p *= P([galois_res, 1.0])
+                    p *= P([-galois_res, 1.0])
 
                 p_over_int, p_int = poly_over_integers(p)
 
