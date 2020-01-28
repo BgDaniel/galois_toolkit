@@ -128,6 +128,7 @@ class PolyEquation:
         self._galois_resolvent = None
         self._sym_galois = None
         self._integer_polynoms = None
+        self._galois_group = None
 
     def from_polynom(polynom):
         return PolyEquation(polynom.coef)
@@ -219,6 +220,7 @@ class PolyEquation:
         galois_polynom = None
         galois_name = None
         galois_is_solvable = False
+        group_tower = None
 
         if self._galois_resolvent == None:
             _, self._galois_resolvent = self.galois_resolvent()
@@ -242,7 +244,7 @@ class PolyEquation:
                     _, remainder = divmod(self._sym_galois_pol, p_int)
 
                     if poly_over_integers(remainder):
-                        is_solv, _ = is_solvable(subgroup)
+                        is_solv, grp_tower = is_solvable(subgroup)
                         self._integer_polynoms[key] =   {   
                                                         'polynom'       : str(p_int), 
                                                         'group'         : key,
@@ -256,14 +258,17 @@ class PolyEquation:
                             galois_polynom = p_int
                             galois_name = key
                             galois_is_solvable = is_solv
+                            group_tower = grp_tower
                         else:
                             if len(subgroup._elements) < len(galois_group._elements):
                                 galois_group = subgroup
                                 galois_polynom = p_int
                                 galois_name = key
                                 galois_is_solvable = is_solv
+                                group_tower = grp_tower
 
-        return galois_name, "solvable: {0}".format(galois_is_solvable), [per.array_form for per in galois_group._elements], poly_to_str(galois_polynom)
+
+        return galois_is_solvable, galois_group, group_tower
 
         
 

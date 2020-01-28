@@ -1,3 +1,5 @@
+import math
+
 def ext_tuples(tuples, m_min, m_max):
     tuples_ext = []
 
@@ -64,4 +66,15 @@ def all_power_sets(n):
     assert len(all_power_sets) == 2 ** n, 'Something went wrong in all_power_sets()!'
     return all_power_sets
 
-
+def is_prime(n):
+    
+    if n == 1:
+        return False
+    elif n == 2:
+        return True
+    else:
+        for i in range(2, 1 + math.ceil(math.sqrt(n))): 
+            if (n % i) == 0:
+                return False
+   
+    return True
