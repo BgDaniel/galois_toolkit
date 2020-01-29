@@ -51,3 +51,5 @@ class Sym4(SymGroup):
     '''A4 in S4'''
     def group_A4(self):
         return PermutationGroup([Permutation([2, 0, 1, 3]), Permutation([1, 0, 3, 2])])
+
+

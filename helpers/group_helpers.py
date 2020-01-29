@@ -38,6 +38,7 @@ def is_solvable(group):
             continue
         index = len(group._elements) / len(descending_groups[i + 1]._elements)
         if not is_prime(index):
+            # if index of commutator is not prime, check if there is a sub tower of normal subin between
             return False, GroupTower(descending_groups, indices)
         else:
             indices.append(index)
